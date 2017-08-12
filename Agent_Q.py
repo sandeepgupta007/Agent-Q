@@ -24,6 +24,8 @@ import speech_recognition as sr
 from pygame import mixer
 import win32com.client as wincl
 import datetime
+import pyaudio
+
 
 speak = wincl.Dispatch("SAPI.SpVoice")
 
@@ -152,15 +154,14 @@ def get(event):
 def buttonClick():
 
     speak.Speak('Listening to you sir !')
+
     r = sr.Recognizer()
-    r.pause_threshold = 0.7
-    r.energy_threshold = 400
+    
+    with sr.Microphone(device_index = 1) as source:
 
-    with sr.Microphone() as source:
-
+        r.adjust_for_ambient_noise(source)
+        audio = r.listen(source)
         try:
-
-            audio = r.listen(source, timeout=5)
             message = str(r.recognize_google(audio))
             entry1.focus()
             entry1.delete(0, END)
